@@ -50,7 +50,7 @@ def cameraCalibration():
 
 # performs the camera calibration, image distortion correction and
 # returns the undistorted image
-def cal_undistort(img, mtx, dist, showResults=False):
+def cal_undistort(img, mtx, dist, showResults=False, filename=[]):
     # Use cv2.calibrateCamera and cv2.undistort()
     img_size = (img.shape[1], img.shape[0])
     # Find the chessboard corners
@@ -64,7 +64,8 @@ def cal_undistort(img, mtx, dist, showResults=False):
         ax2.set_title('Undistorted Image', fontsize=50)
         plt.subplots_adjust(left=0., right=1, top=0.9, bottom=0.)
         plt.show()
-        f.savefig('../output/undist_chess.jpg', dpi=f.dpi)
+        if len(filename) != 0 :
+            f.savefig(filename, dpi=f.dpi)
     return undist
 
 # A function that applies Sobel x or y,
@@ -138,7 +139,7 @@ def RChannel_threshold(img, thresh=(0,255)):
     binary_output[(r_channel >= thresh[0]) & (r_channel <= thresh[1])] = 1
     return binary_output
 
-def combined_threshold(img, plotresults=False):
+def combined_threshold(img, showresults=False):
     """Find and return a binary image based on the combination of thresholds.
     Uses an optional region of interest polygon.
     """
@@ -150,7 +151,7 @@ def combined_threshold(img, plotresults=False):
     # Combine the two binary thresholds
     combined_binary = np.zeros_like(sx_binary)
     combined_binary[(s_binary == 1) | (sx_binary == 1) | (r_binary == 1)] = 1
-    if plotresults:
+    if showresults:
         #Plot the result
         f, (ax1, ax2) = plt.subplots(1, 2, figsize=(24, 9))
         f.tight_layout()
@@ -174,14 +175,12 @@ def warper(src=None, dst=None, inverse=False):
                           [1030, 668],
                           [290, 668]])
 
-    #print("src: {}".format(src))
     if dst is None:
         dst = np.float32([[300, 70],
                           [1000, 70],
                           [1000, 600],
                           [300, 600]])
 
-    #print("dst: {}".format(dst))
     # Given src and dst points, calculate the perspective transform matrix
     if not inverse:
         M = cv2.getPerspectiveTransform(src, dst)
@@ -190,11 +189,11 @@ def warper(src=None, dst=None, inverse=False):
     return M
 
 
-def warpImage(img, M, plotresults=False):
+def warpImage(img, M, showresults=False):
     img_size = (img.shape[1], img.shape[0])
     warped = cv2.warpPerspective(img, M, img_size)
 
-    if plotresults:
+    if showresults:
         f, (ax1, ax2) = plt.subplots(1, 2, figsize=(24, 9))
         f.tight_layout()
         ax1.imshow(img, cmap='gray')
@@ -430,41 +429,23 @@ class Pipeline:
         return overlay_detected_lane_data(image, self.lanes_average, self.unwarp)
 
 if __name__ == '__main__':
-    #mtx, dist = cameraCalibration()
     dist_pickle = pickle.load(open("../results/wide_dist_pickle.p", "rb"))
     mtx = dist_pickle["mtx"]
     dist = dist_pickle["dist"]
     img = cv2.imread('../camera_cal/calibration1.jpg')
     img = cv2.cvtColor(img, cv2.COLOR_BGR2RGB)
-    undistorted = cal_undistort(img, mtx, dist, showResults=True)
-    #filename = 'straight_lines1.jpg'
+    undistorted = cal_undistort(img, mtx, dist, True, '../output/undist_chess.jpg')
     filename = 'test2.jpg'
     image = mpimg.imread('../test_images/' + filename)
-    undistorted = cal_undistort(image, mtx, dist)
-
-    #binary = combined_threshold(undistorted, plotresults=True)
-    #src = np.float32([(613, 435), (670, 435), (1044, 680), (277, 680)])
-    #dst = np.float32([(320, 100), (1000, 100), (1000, 700), (320, 700)])
-    #warpedBinary, _ = warper(binary, src=src, dst=dst, plotresults=True)
+    undistorted = cal_undistort(image, mtx, dist, True, '../output/undist_img.jpg')
     M = warper()
     invM = warper(inverse=True)
-    warpedImage= warpImage(undistorted, M, plotresults=True)
-    #warpedBinary = warpImage(binary, M)
-    warpedBinary = combined_threshold(warpedImage, plotresults=True)
-    # f, (ax1, ax2) = plt.subplots(1, 2, figsize=(24, 9))
-    # f.tight_layout()
-    # ax1.imshow(warpedImage, cmap='gray')
-    # ax1.set_title('Undistorted top-down image', fontsize=40)
-    # ax2.imshow(warpedBinary, cmap='gray')
-    # ax2.set_title('After thresholding', fontsize=40)
-    # plt.subplots_adjust(left=0., right=1, top=0.9, bottom=0.)
-    # plt.show()
-    # f.savefig('../output/warped_binary.jpg', dpi=f.dpi)
-    #load_image_and_overlay_information(image, warpedBinary, True)
+    warpedImage= warpImage(undistorted, M, True)
+    warpedBinary = combined_threshold(warpedImage, True)
     lanes, out = detect_lane_lines(warpedBinary)
     display_lanes_window(out, lanes)
-    #img = overlay_information(image, lanes)
-    img = overlay_detected_lane_data(image, lanes, invM, showresults=True)
+    img = overlay_detected_lane_data(image, lanes, invM, True)
+
     # np.seterr(all='ignore')
     # pipeline = Pipeline()
     # clip1 = VideoFileClip("../video/project_video.mp4", audio=False)
