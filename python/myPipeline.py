@@ -1,7 +1,10 @@
 import matplotlib.image as mpimg
 import pickle
 from lane import *
-from overlay import *
+from  overlay import  *
+from moviepy.editor import VideoFileClip
+
+
 
 # performs the camera calibration, image distortion correction and
 # returns the undistorted image
@@ -158,7 +161,7 @@ def warpImage(img, M, showresults=False):
         ax2.set_title('Warped top-down image', fontsize=40)
         plt.subplots_adjust(left=0., right=1, top=0.9, bottom=0.)
         plt.show()
-        f.savefig('../output/warped_img.jpg', dpi=f.dpi)
+        f.savefig('../output_images/warped_img.jpg', dpi=f.dpi)
     # Return the resulting image and matrix
     return warped
 
@@ -304,7 +307,7 @@ def display_lanes_window(out_img, lanes):
     plt.ylim(720, 0)
     plt.title('Detected lane')
     plt.show()
-    f.savefig('../output/lanes.jpg', dpi=f.dpi, bbox_inches='tight')
+    f.savefig('../output_images/lanes.jpg', dpi=f.dpi, bbox_inches='tight')
 
 
 class Pipeline:
@@ -338,23 +341,23 @@ if __name__ == '__main__':
     img = cv2.cvtColor(img, cv2.COLOR_BGR2RGB)
     M = warper()
     invM = warper(inverse=True)
-    undistorted = cal_undistort(img, mtx, dist, True, '../output/undist_chess.jpg')
+    undistorted = cal_undistort(img, mtx, dist, True, '../output_images/undist_chess.jpg')
     filename = 'straight_lines2.jpg'
     image = mpimg.imread('../test_images/' + filename)
     undistorted = cal_undistort(image, mtx, dist)
     warpedImage = warpImage(undistorted, M, True)
     filename = 'test2.jpg'
     image = mpimg.imread('../test_images/' + filename)
-    undistorted = cal_undistort(image, mtx, dist, True, '../output/undist_img.jpg')
-    combined_threshold(undistorted, True, '../output/binarize_unwarp_comb.jpg')
+    undistorted = cal_undistort(image, mtx, dist, True, '../output_images/undist_img.jpg')
+    combined_threshold(undistorted, True, '../output_images/binarize_unwarp_comb.jpg')
     warpedImage= warpImage(undistorted, M)
-    warpedBinary = combined_threshold(warpedImage, True, '../output/binarize_warp_comb.jpg')
+    warpedBinary = combined_threshold(warpedImage, True, '../output_images/binarize_warp_comb.jpg')
     lanes, out = detect_lane_lines(warpedBinary)
     display_lanes_window(out, lanes)
     img = overlay_detected_lane_data(image, lanes, invM, True)
 
-    # np.seterr(all='ignore')
-    # pipeline = Pipeline()
-    # clip1 = VideoFileClip("../video/project_video.mp4", audio=False)
-    # white_clip = clip1.fl_image(pipeline.process_image)
-    # white_clip.write_videofile("../output/project_video.mp4", audio=False)
+    np.seterr(all='ignore')
+    pipeline = Pipeline()
+    clip1 = VideoFileClip("../video/project_video.mp4", audio=False)
+    white_clip = clip1.fl_image(pipeline.process_image)
+    white_clip.write_videofile("../output_images/project_video.mp4", audio=False)
