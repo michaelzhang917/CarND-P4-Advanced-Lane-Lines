@@ -393,14 +393,18 @@ if __name__ == '__main__':
     dist = dist_pickle["dist"]
     img = cv2.imread('../camera_cal/calibration1.jpg')
     img = cv2.cvtColor(img, cv2.COLOR_BGR2RGB)
+    M = warper()
+    invM = warper(inverse=True)
     undistorted = cal_undistort(img, mtx, dist, True, '../output/undist_chess.jpg')
+    filename = 'straight_lines2.jpg'
+    image = mpimg.imread('../test_images/' + filename)
+    undistorted = cal_undistort(image, mtx, dist)
+    warpedImage = warpImage(undistorted, M, True)
     filename = 'test2.jpg'
     image = mpimg.imread('../test_images/' + filename)
     undistorted = cal_undistort(image, mtx, dist, True, '../output/undist_img.jpg')
     combined_threshold(undistorted, True, '../output/binarize_unwarp_comb.jpg')
-    M = warper()
-    invM = warper(inverse=True)
-    warpedImage= warpImage(undistorted, M, True)
+    warpedImage= warpImage(undistorted, M)
     warpedBinary = combined_threshold(warpedImage, True, '../output/binarize_warp_comb.jpg')
     lanes, out = detect_lane_lines(warpedBinary)
     display_lanes_window(out, lanes)
