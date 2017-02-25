@@ -1,52 +1,10 @@
-import numpy as np
 import cv2
 import matplotlib.pyplot as plt
 import matplotlib.image as mpimg
-import glob
 import pickle
 from overlay import overlay_text
 from lane import *
-from moviepy.editor import VideoFileClip
 
-def cameraCalibration():
-    # number of inside points on chessboard
-    nx = 9
-    ny = 6
-
-    # prepare object points, like (0,0,0), (1,0,0), (2,0,0) ....,(6,5,0)
-    objp = np.zeros((ny*nx,3), np.float32)
-    objp[:,:2] = np.mgrid[0:nx, 0:ny].T.reshape(-1,2)
-
-    # Arrays to store object points and image points from all the images.
-    objpoints = [] # 3d points in real world space
-    imgpoints = [] # 2d points in image plane.
-
-    # Make a list of calibration images
-    images = glob.glob('../camera_cal/calibration*.jpg')
-
-    # Step through the list and search for chessboard corners
-    for idx, fname in enumerate(images):
-        img = cv2.imread(fname)
-        gray = cv2.cvtColor(img, cv2.COLOR_BGR2GRAY)
-
-        # Find the chessboard corners
-        ret, corners = cv2.findChessboardCorners(gray, (nx,ny), None)
-
-        # If found, add object points, image points
-        if ret == True:
-            print(fname)
-            objpoints.append(objp)
-            imgpoints.append(corners)
-            # Draw and save the corners
-            cv2.drawChessboardCorners(img, (8,6), corners, ret)
-            write_name = '../results/corners_found'+str(idx)+'.jpg'
-            cv2.imwrite(write_name, img)
-
-    ret, mtx, dist, rvecs, tvecs = cv2.calibrateCamera(objpoints, imgpoints, gray.shape[::-1], None, None)
-    dist_pickle = {'mtx': mtx, 'dist': dist}
-    with open('../results/wide_dist_pickle.p', 'wb') as f:
-        pickle.dump(dist_pickle, f)
-    return mtx, dist
 
 # performs the camera calibration, image distortion correction and
 # returns the undistorted image
@@ -139,7 +97,7 @@ def RChannel_threshold(img, thresh=(0,255)):
     binary_output[(r_channel >= thresh[0]) & (r_channel <= thresh[1])] = 1
     return binary_output
 
-def combined_threshold(img, showresults=False):
+def combined_threshold(img, showresults=False, filename=[]):
     """Find and return a binary image based on the combination of thresholds.
     Uses an optional region of interest polygon.
     """
@@ -162,7 +120,8 @@ def combined_threshold(img, showresults=False):
         ax2.set_title('Combined thresholding result', fontsize=40)
         plt.subplots_adjust(left=0., right=1, top=0.9, bottom=0.)
         plt.show()
-        f.savefig('../output/binarize_comb.jpg', dpi=f.dpi)
+        if len(filename) != 0:
+            f.savefig(filename, dpi=f.dpi)
     return combined_binary
 
 
@@ -438,10 +397,11 @@ if __name__ == '__main__':
     filename = 'test2.jpg'
     image = mpimg.imread('../test_images/' + filename)
     undistorted = cal_undistort(image, mtx, dist, True, '../output/undist_img.jpg')
+    combined_threshold(undistorted, True, '../output/binarize_unwarp_comb.jpg')
     M = warper()
     invM = warper(inverse=True)
     warpedImage= warpImage(undistorted, M, True)
-    warpedBinary = combined_threshold(warpedImage, True)
+    warpedBinary = combined_threshold(warpedImage, True, '../output/binarize_warp_comb.jpg')
     lanes, out = detect_lane_lines(warpedBinary)
     display_lanes_window(out, lanes)
     img = overlay_detected_lane_data(image, lanes, invM, True)
