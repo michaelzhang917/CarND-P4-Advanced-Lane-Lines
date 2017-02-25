@@ -97,5 +97,5 @@ Here's a [link to my video result](https://www.youtube.com/watch?v=LKkkoLQfzLA&f
 
 ####1. Briefly discuss any problems / issues you faced in your implementation of this project.  Where will your pipeline likely fail?  What could you do to make it more robust?
 
-Here I'll talk about the approach I took, what techniques I used, what worked and why, where the pipeline might fail and how I might improve it if I were going to pursue this project further.  
+First, it takes me some time to manuanlly find the good points for warping the image to birdeye view. Second, I have tried some other gradient thresholding mehtods such as magitude and direction but they seems not provding me better solution. In addition, my estimation was not stable but after adding estimation averaging technique, the results becomes quite stable. This is probably because the all the gradient thresholding technique are quite relied on the constrast of the images. This average technique could fail if there is a lot sharp turns and the light changing. One could use some more advanced technique such as Kalman filter to get more stable results.
 
