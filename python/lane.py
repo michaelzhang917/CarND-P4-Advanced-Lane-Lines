@@ -11,7 +11,6 @@ class PixelCalculations:
     def __init__(self, xs, ys):
         self.xs = xs
         self.ys = ys
-
         self.__fit = None
         self.__p = None
         self.__p1 = None
