@@ -79,7 +79,7 @@ I did this in lines 10 through 47 in my code in `lane.py` which implenments the 
 
 ####6. Provide an example image of your result plotted back down onto the road such that the lane area is identified clearly.
 
-I implemented this step in lines # through # in my code in `yet_another_file.py` in the function `map_lane()`.  Here is an example of my result on a test image:
+I implemented this step in `overlay.py`.  Here is an example of my result on a test image:
 
 ![alt text][image6]
 
