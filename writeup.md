@@ -17,9 +17,9 @@ The goals / steps of this project are the following:
 [image2]: ./output/undist_img.jpg "Road Transformed"
 [image3]: ./output/binarize_unwarp_comb.jpg "Binary Example"
 [image4]: ./output/warped_img.jpg "Warp Example"
-[image5]: ./examples/color_fit_lines.jpg "Fit Visual"
-[image6]: ./examples/example_output.jpg "Output"
-[video1]: ./project_video.mp4 "Video"
+[image5]: ./output/lanes.jpg "Fit Visual"
+[image6]: ./output/overlay.jpg "Output"
+[video1]: ./output/project_video.mp4 "Video"
 
 ## [Rubric](https://review.udacity.com/#!/rubrics/571/view) Points
 ###Here I will consider the rubric points individually and describe how I addressed each point in my implementation.  
