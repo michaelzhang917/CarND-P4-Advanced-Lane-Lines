@@ -69,13 +69,13 @@ I verified that my perspective transform was working as expected by drawing the 
 
 ####4. Describe how (and identify where in your code) you identified lane-line pixels and fit their positions with a polynomial?
 
-Then I implenmented the steps introduced in the class (i.e., Section 33. Finding the Lines in Lesson 18) to find lane lines. It first used the histogram and window slidinng to identify lane-line pixels and then fitted lane lines with a 2nd order polynomial. The results like this:
+Then I implenmented the steps (in lines 169 through 278 in the file `myPipeline.py`) introduced in the class (i.e., Section 33. Finding the Lines in Lesson 18) to find lane lines. It first used the histogram and window slidinng to identify lane-line pixels and then fitted lane lines with a 2nd order polynomial. The results like this:
 
 ![alt text][image5]
 
 ####5. Describe how (and identify where in your code) you calculated the radius of curvature of the lane and the position of the vehicle with respect to center.
 
-I did this in lines # through # in my code in `my_other_file.py`
+I did this in lines 10 through 47 in my code in `lane.py` which implenments the technique introducetd in Section 35. Mearuesing Curvature of Lesson 18). It essentially used the formula for the radius of curature in the pixel space and the then transfer it to the real world space. We then used the polynomials of the left and right lanes to calculate the position of the vehicle with respect to center (see lines 87 through 92 in `lane.py`.
 
 ####6. Provide an example image of your result plotted back down onto the road such that the lane area is identified clearly.
 
